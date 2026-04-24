@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<%- include('partials/standalone_head') %>
+<body class="standalone-liquid-page">
+    <main class="standalone-shell standalone-shell--narrow standalone-stack">
+        <a href="<%= typeof backFormUrl !== 'undefined' && backFormUrl ? backFormUrl : '/form/standalone' %>" class="standalone-back-link">← <%= t('submitPreview.backForm') %></a>
+
+        <section class="glass-panel standalone-state-card">
+            <div>
+                <p class="glass-eyebrow"><%= t('submitPreview.badge') %></p>
+                <h1><%= t('submitPreview.title') %></h1>
+                <p class="standalone-state-card__intro"><%= t('submitPreview.intro') %></p>
+            </div>
+            <p class="standalone-summary"><strong><%= t('submitPreview.targetUrl') %></strong> <code><%= googleFormUrl %></code></p>
+        </section>
+
+        <section class="glass-panel standalone-card">
+            <div class="standalone-table-wrap glass-table">
+                <table class="standalone-table">
+                    <thead>
+                        <tr>
+                            <th><%= t('submitPreview.columns.entry') %></th>
+                            <th><%= t('submitPreview.columns.field') %></th>
+                            <th><%= t('submitPreview.columns.value') %></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% fields.forEach((field) => { %>
+                            <tr>
+                                <td><code><%= field.entryId %></code></td>
+                                <td><%= field.label %></td>
+                                <td><%= field.value %></td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="glass-panel standalone-card">
+            <p class="glass-eyebrow"><%= t('submitPreview.payloadEyebrow') %></p>
+            <h2><%= t('submitPreview.payload') %></h2>
+            <pre class="standalone-code-block"><%= encodedPayload %></pre>
+            <div class="standalone-actions">
+                <a href="<%= typeof backFormUrl !== 'undefined' && backFormUrl ? backFormUrl : '/form/standalone' %>"><%= t('submitPreview.backForm') %></a>
+            </div>
+        </section>
+
+        <%- include('partials/standalone_foot') %>
+    </main>
+</body>
+</html>

@@ -1,0 +1,46 @@
+{
+  "$schema": "../../node_modules/wrangler/config-schema.json",
+  "name": "nct-standalone-form",
+  "main": "./worker.mjs",
+  "compatibility_date": "2026-04-17",
+  "compatibility_flags": [
+    "nodejs_compat"
+  ],
+  "vars": {
+    "FRONTEND_VARIANT": "legacy",
+    "RUNTIME_TARGET": "workers"
+  },
+  "d1_databases": [
+    {
+      "binding": "NCT_DB",
+      "migrations_dir": "../../migrations"
+    }
+  ],
+  "find_additional_modules": true,
+  "base_dir": "../..",
+  "preserve_file_names": true,
+  "rules": [
+    {
+      "type": "Text",
+      "globs": [
+        "views/maintenance.ejs",
+        "views/partials/standalone_*.ejs",
+        "views/standalone_*.ejs"
+      ],
+      "fallthrough": true
+    },
+    {
+      "type": "Data",
+      "globs": [
+        "public/css/standalone-form.css",
+        "public/favicon.svg",
+        "public/js/form_api.js",
+        "public/js/form_areaSelect.js",
+        "public/js/form_mapChoose.js",
+        "public/js/map_data_store.js",
+        "public/js/standalone_form.js"
+      ],
+      "fallthrough": true
+    }
+  ]
+}

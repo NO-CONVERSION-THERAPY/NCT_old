@@ -1,0 +1,21 @@
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="color-scheme" content="light dark">
+    <% if (typeof pageRobots !== 'undefined' && pageRobots) { %>
+    <meta name="robots" content="<%= pageRobots %>">
+    <% } %>
+    <title><%- title %></title>
+    <link rel="icon" href="/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;600;700;800&family=Noto+Serif+SC:wght@600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="/css/standalone-form.css?v=<%= assetVersion %>">
+    <script>
+        window.API_URL = "<%= typeof apiUrl !== 'undefined' ? apiUrl : '' %>";
+        window.APP_LANG = "<%= lang %>";
+        window.ASSET_VERSION = "<%= assetVersion || '' %>";
+        window.I18N = <%- JSON.stringify(clientMessages) %>;
+        window.FORM_UI_TEXT = window.I18N.form || {};
+    </script>
+</head>

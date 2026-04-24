@@ -1,0 +1,8 @@
+{
+  "name": "nct-standalone-form-worker",
+  "private": true,
+  "scripts": {
+    "dev": "npx wrangler dev -c wrangler.jsonc",
+    "deploy": "npx wrangler deploy -c wrangler.jsonc --keep-vars"
+  }
+}

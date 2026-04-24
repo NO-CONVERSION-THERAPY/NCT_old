@@ -1,0 +1,14 @@
+<footer class="site-footer">
+    <p class="site-footer__meta"><%= t('common.footerBy') %></p>
+    <nav class="site-footer__links" aria-label="<%= t('common.footerNavLabel') %>">
+        <a href="/map"><%= t('map.title') %></a>
+        <a href="/blog"><%= t('blog.title') %></a>
+        <a href="/privacy"><%= t('navigation.privacy') %></a>
+    </nav>
+</footer>
+<% if (typeof includeBackToTopScript !== 'undefined' && includeBackToTopScript) { %>
+<script src="/js/map_backTop.js"></script>
+<% } %>
+<% if (typeof includeQueryUpdScript !== 'undefined' && includeQueryUpdScript) { %>
+<script src="/js/queryUpd.js"></script>
+<% } %>

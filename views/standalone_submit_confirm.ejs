@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<%- include('partials/standalone_head') %>
+<body class="standalone-liquid-page">
+    <main class="standalone-shell standalone-shell--narrow standalone-stack">
+        <a href="<%= typeof backFormUrl !== 'undefined' && backFormUrl ? backFormUrl : '/form/standalone' %>" class="standalone-back-link">← <%= t('submitConfirm.backForm') %></a>
+
+        <section class="glass-panel standalone-state-card">
+            <div>
+                <p class="glass-eyebrow"><%= t('submitConfirm.badge') %></p>
+                <h1><%= t('submitConfirm.title') %></h1>
+                <p class="standalone-state-card__intro"><%= t('submitConfirm.intro') %></p>
+            </div>
+        </section>
+
+        <section class="glass-panel standalone-card">
+            <div class="standalone-table-wrap glass-table">
+                <table class="standalone-table">
+                    <thead>
+                        <tr>
+                            <th><%= t('submitConfirm.columns.field') %></th>
+                            <th><%= t('submitConfirm.columns.value') %></th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <% fields.forEach((field) => { %>
+                            <tr>
+                                <td><%= field.label %></td>
+                                <td><%= field.value %></td>
+                            </tr>
+                        <% }) %>
+                    </tbody>
+                </table>
+            </div>
+        </section>
+
+        <section class="glass-panel standalone-card">
+            <form action="<%= typeof confirmAction !== 'undefined' && confirmAction ? confirmAction : '/form/standalone/submit/confirm' %>" method="POST" id="confirmForm" class="confirm-form">
+                <input type="hidden" name="confirmation_token" value="<%= confirmationToken %>">
+                <textarea name="confirmation_payload" hidden><%= confirmationPayload %></textarea>
+                <div class="standalone-actions">
+                    <a href="<%= typeof backFormUrl !== 'undefined' && backFormUrl ? backFormUrl : '/form/standalone' %>"><%= t('submitConfirm.backForm') %></a>
+                    <button type="submit" id="confirmSubmitButton" class="button-primary"><%= t('submitConfirm.confirm') %></button>
+                </div>
+            </form>
+        </section>
+
+        <%- include('partials/standalone_foot') %>
+    </main>
+    <script>
+        const confirmForm = document.getElementById('confirmForm');
+        const confirmSubmitButton = document.getElementById('confirmSubmitButton');
+        const i18n = window.I18N;
+
+        if (confirmForm && confirmSubmitButton) {
+            confirmForm.addEventListener('submit', () => {
+                confirmSubmitButton.disabled = true;
+                confirmSubmitButton.textContent = i18n.submitConfirm.confirming || i18n.common.loading;
+            });
+        }
+    </script>
+</body>
+</html>

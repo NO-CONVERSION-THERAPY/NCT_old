@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="<%= lang %>">
+<%- include('partials/standalone_head') %>
+<body class="standalone-liquid-page">
+    <main class="standalone-shell standalone-shell--narrow standalone-stack">
+        <section class="glass-panel standalone-state-card standalone-state-card--success">
+            <div>
+                <p class="glass-eyebrow"><%= t('submitSuccess.badge') %></p>
+                <h1><%= t('submitSuccess.title') %></h1>
+                <p class="standalone-state-card__intro"><%= t('submitSuccess.message') %></p>
+            </div>
+
+            <div class="standalone-actions">
+                <a href="<%= typeof backFormUrl !== 'undefined' && backFormUrl ? backFormUrl : '/form/standalone' %>" class="button-primary"><%= t('submitSuccess.backForm') %></a>
+            </div>
+
+            <% if (showSubmissionDiagnostics && submissionDiagnostics) { %>
+                <div class="standalone-diagnostics">
+                    <h2><%= t('submitStatus.title') %></h2>
+                    <p><strong><%= t('submitStatus.mode') %></strong> <%= submissionDiagnostics.attemptedTargets.map((target) => target.label).join(' / ') %></p>
+                    <p><strong><%= t('submitStatus.successfulTargets') %></strong> <%= submissionDiagnostics.successfulTargets.length > 0 ? submissionDiagnostics.successfulTargets.map((target) => target.label).join(' / ') : t('submitStatus.none') %></p>
+                    <p><strong><%= t('submitStatus.failedTargets') %></strong> <%= submissionDiagnostics.failedTargets.length > 0 ? submissionDiagnostics.failedTargets.map((target) => target.label).join(' / ') : t('submitStatus.none') %></p>
+                    <% if (submissionDiagnostics.failedTargets.length > 0) { %>
+                        <div class="standalone-diagnostics__errors">
+                            <% submissionDiagnostics.failedTargets.forEach((target) => { %>
+                                <p><strong><%= target.label %></strong> <%= t('submitStatus.error') %><%= target.error %></p>
+                            <% }) %>
+                        </div>
+                    <% } %>
+                </div>
+            <% } %>
+        </section>
+
+        <%- include('partials/standalone_foot') %>
+    </main>
+</body>
+</html>
