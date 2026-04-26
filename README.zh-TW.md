@@ -33,7 +33,7 @@
 - [關鍵配置](#關鍵配置)
 - [保護敏感配置](#保護敏感配置)
 - [表單隱私說明](#表單隱私說明)
-- [部署說明](#部署說明)
+- [Cloudflare Workers 部署](#cloudflare-workers-部署)
 - [路由總覽](#路由總覽)
 - [執行期 API 現狀](#執行期-api-現狀)
 - [相關檔案](#相關檔案)
@@ -324,40 +324,37 @@ npm run secure-config -- encrypt --purpose google-script-url --secret "你的_FO
 - `/privacy`
 - 本 README
 
-## 部署說明
+## Cloudflare Workers 部署
 
-### Cloudflare Workers 主站
+僅建議使用 Cloudflare Dashboard 的 Workers Builds 網頁部署。`NCT_old` 有兩個可選 Worker：舊版主站 `nct-old`，以及獨立問卷入口 `nct-old-standalone-form-worker`。
 
-先在本地驗證：
+部署命令會執行 `npm run cf:ensure`，自動建立所需 D1 資料庫、把真實 `database_id` 寫入目前建置環境中的 Wrangler 設定，並執行遠端 D1 migrations；不需要手動建立 D1，也不要提交帳號專屬的 `database_id`。
 
-```bash
-cp .dev.vars.example .dev.vars
-npm run dev:workers
-npm test
-```
+### 舊版主站 Worker
 
-部署：
+| Cloudflare 頁面欄位 | 填寫值 |
+| --- | --- |
+| Project name | `nct-old` |
+| Production branch | 你的生產分支，例如 `main` |
+| Path / Root directory | 在本倉庫部署填 `NCT_old`；如果本專案單獨成庫填 `/` |
+| Build command | `npm test` |
+| Deploy command | `npm run deploy:workers` |
+| Non-production branch deploy command | `npm run deploy:workers:preview` |
 
-```bash
-npm run deploy:workers
-```
-
-說明：
-
-- 主站 Workers 配置位於 [`wrangler.jsonc`](./wrangler.jsonc)
-- 倉庫內保留了最小的 `NCT_DB` D1 綁定；帳號專屬設定請放到 Cloudflare Dashboard
-- 敏感值儘量放進 `Variables and Secrets`
+請在 `Settings` -> `Variables and Secrets` 配置執行期變數與密鑰，並在 `Settings` -> `Domains & Routes` 綁定自訂網域。
 
 ### 獨立問卷 Worker
 
-如果你只想部署問卷入口，可使用：
+| Cloudflare 頁面欄位 | 填寫值 |
+| --- | --- |
+| Project name | `nct-old-standalone-form-worker` |
+| Production branch | 你的生產分支，例如 `main` |
+| Path / Root directory | 在本倉庫部署填 `NCT_old`；如果本專案單獨成庫填 `/` |
+| Build command | `npm run test:standalone` |
+| Deploy command | `npm run deploy:workers:standalone-form` |
+| Non-production branch deploy command | `npm run deploy:workers:standalone-form:preview` |
 
-```bash
-npm run dev:workers:standalone-form
-npm run deploy:workers:standalone-form
-```
-
-Worker 專屬說明請參見 [standalone/form-worker/README.md](./standalone/form-worker/README.md)。
+請將它建立為獨立於舊版主站的 Worker。在 `Settings` -> `Variables and Secrets` 配置獨立問卷變數後，再綁定自訂網域。
 
 ### Node / Vercel 相容入口
 

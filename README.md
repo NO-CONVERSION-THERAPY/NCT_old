@@ -33,7 +33,7 @@
 - [关键配置](#关键配置)
 - [保护敏感配置](#保护敏感配置)
 - [表单隐私说明](#表单隐私说明)
-- [部署说明](#部署说明)
+- [Cloudflare Workers 部署](#cloudflare-workers-部署)
 - [路由总览](#路由总览)
 - [运行时接口现状](#运行时接口现状)
 - [相关文件](#相关文件)
@@ -324,40 +324,51 @@ npm run secure-config -- encrypt --purpose google-script-url --secret "你的_FO
 - `/privacy`
 - 本 README
 
-## 部署说明
+## Cloudflare Workers 部署
 
-### Cloudflare Workers 主站
+仅推荐使用 Cloudflare Dashboard 的 Workers Builds 网页部署。`NCT_old` 有两个可选 Worker：旧版主站 `nct-old`，以及独立问卷入口 `nct-old-standalone-form-worker`。
 
-本地验证：
+部署命令里的 `npm run cf:ensure` 会自动创建对应 D1 数据库、把真实 `database_id` 写入当前构建环境中的 Wrangler 配置，并执行远端 D1 migrations；不需要再手动创建 D1 或手动填写 `database_id`。
 
-```bash
-cp .dev.vars.example .dev.vars
-npm run dev:workers
-npm test
-```
+### 旧版主站 Worker
 
-部署：
+| Cloudflare 页面字段 | 填写值 |
+| --- | --- |
+| Project name | `nct-old` |
+| Production branch | 你的生产分支，例如 `main` |
+| Path / Root directory | 在本仓库部署填 `NCT_old`；如果本项目单独成库填 `/` |
+| Build command | `npm test` |
+| Deploy command | `npm run deploy:workers` |
+| Non-production branch deploy command | `npm run deploy:workers:preview` |
 
-```bash
-npm run deploy:workers
-```
+网页端步骤：
 
-说明：
-
-- 主站入口配置见 [`wrangler.jsonc`](./wrangler.jsonc)
-- 仓库保留了最小 D1 绑定 `NCT_DB`，账号专属变量应放到 Cloudflare Dashboard
-- 敏感值请优先放进 `Variables and Secrets`
+1. 进入 Cloudflare Dashboard -> `Workers & Pages` -> `Create` -> `Import a repository`。
+2. 选择 Git 仓库后，按上表填写 `Project name`、`Path`、`Build command`、`Deploy command` 和 `Non-production branch deploy command`。
+3. 在 `Settings` -> `Variables and Secrets` 配置运行时变量和敏感值，例如 `SITE_URL`、`FORM_DRY_RUN`、`FORM_SUBMIT_TARGET`、`FORM_PROTECTION_SECRET`、Google Form 相关变量、`PUBLIC_MAP_DATA_URL`。
+4. 如果启用 D1 提交，把 `FORM_SUBMIT_TARGET` 或 `CORRECTION_SUBMIT_TARGET` 设为 `d1` / `both`；部署命令会自动创建并迁移 D1 数据库 `nct-old`。
+5. 在 `Settings` -> `Domains & Routes` -> `Add` -> `Custom Domain` 绑定旧站域名。
+6. 推送生产分支触发部署。
 
 ### 独立问卷 Worker
 
-如果你只想单独部署问卷入口，请使用：
+| Cloudflare 页面字段 | 填写值 |
+| --- | --- |
+| Project name | `nct-old-standalone-form-worker` |
+| Production branch | 你的生产分支，例如 `main` |
+| Path / Root directory | 在本仓库部署填 `NCT_old`；如果本项目单独成库填 `/` |
+| Build command | `npm run test:standalone` |
+| Deploy command | `npm run deploy:workers:standalone-form` |
+| Non-production branch deploy command | `npm run deploy:workers:standalone-form:preview` |
 
-```bash
-npm run dev:workers:standalone-form
-npm run deploy:workers:standalone-form
-```
+网页端步骤：
 
-相关目录见 [standalone/form-worker/README.md](./standalone/form-worker/README.md)。
+1. 在 Cloudflare Dashboard 中为独立问卷单独创建一个 Worker，不要复用旧版主站 Worker。
+2. 连接同一个 Git 仓库，按上表填写 Workers Builds 设置。
+3. 在 `Settings` -> `Variables and Secrets` 配置 `RUNTIME_TARGET=workers`、`FRONTEND_VARIANT=legacy`、`FORM_DRY_RUN`、`FORM_SUBMIT_TARGET`、`FORM_PROTECTION_SECRET`、`SITE_URL`、Google Form 或 D1 相关变量。
+4. 如果启用 D1 提交，部署命令会自动创建并迁移 D1 数据库 `nct-old-standalone-form-worker`。
+5. 在 `Settings` -> `Domains & Routes` -> `Add` -> `Custom Domain` 绑定问卷域名。
+6. 推送生产分支触发部署；部署完成后，这个 Worker 的首页 `/` 就是问卷填写页。
 
 ### Node / Vercel 兼容入口
 

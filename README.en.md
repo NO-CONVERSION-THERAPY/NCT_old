@@ -33,7 +33,7 @@
 - [Key Configuration](#key-configuration)
 - [Protecting Sensitive Configuration](#protecting-sensitive-configuration)
 - [Form Privacy Notice](#form-privacy-notice)
-- [Deployment Notes](#deployment-notes)
+- [Cloudflare Workers Deployment](#cloudflare-workers-deployment)
 - [Route Overview](#route-overview)
 - [Runtime API Status](#runtime-api-status)
 - [Related Files](#related-files)
@@ -324,40 +324,37 @@ If you later change which fields are public, make sure to update all of these to
 - `/privacy`
 - this README
 
-## Deployment Notes
+## Cloudflare Workers Deployment
 
-### Main Cloudflare Workers site
+Use Cloudflare Dashboard Workers Builds. `NCT_old` has two optional Workers: the legacy site `nct-old`, and the standalone questionnaire entry `nct-old-standalone-form-worker`.
 
-Validate locally first:
+The deploy commands run `npm run cf:ensure`, which automatically creates the needed D1 database, writes the real `database_id` into the current build workspace, and applies remote D1 migrations. Do not manually create D1 or commit account-specific `database_id` values.
 
-```bash
-cp .dev.vars.example .dev.vars
-npm run dev:workers
-npm test
-```
+### Main Worker
 
-Deploy:
+| Cloudflare field | Value |
+| --- | --- |
+| Project name | `nct-old` |
+| Production branch | your production branch, for example `main` |
+| Path / Root directory | `NCT_old` in this monorepo; `/` if this project is standalone |
+| Build command | `npm test` |
+| Deploy command | `npm run deploy:workers` |
+| Non-production branch deploy command | `npm run deploy:workers:preview` |
 
-```bash
-npm run deploy:workers
-```
+Set runtime variables and secrets in `Settings` -> `Variables and Secrets`, then bind the custom domain in `Settings` -> `Domains & Routes`.
 
-Notes:
+### Standalone Questionnaire Worker
 
-- The main-site Workers config lives in [`wrangler.jsonc`](./wrangler.jsonc)
-- The repository keeps a minimal `NCT_DB` D1 binding; account-specific settings should go into the Cloudflare Dashboard
-- Put sensitive values in `Variables and Secrets` whenever possible
+| Cloudflare field | Value |
+| --- | --- |
+| Project name | `nct-old-standalone-form-worker` |
+| Production branch | your production branch, for example `main` |
+| Path / Root directory | `NCT_old` in this monorepo; `/` if this project is standalone |
+| Build command | `npm run test:standalone` |
+| Deploy command | `npm run deploy:workers:standalone-form` |
+| Non-production branch deploy command | `npm run deploy:workers:standalone-form:preview` |
 
-### Standalone questionnaire Worker
-
-If you only want to deploy the questionnaire entry, use:
-
-```bash
-npm run dev:workers:standalone-form
-npm run deploy:workers:standalone-form
-```
-
-See [standalone/form-worker/README.md](./standalone/form-worker/README.md) for the Worker-specific notes.
+Create this as a separate Worker from the legacy site. Set the standalone form variables in `Settings` -> `Variables and Secrets`, then bind its custom domain.
 
 ### Node / Vercel-compatible entry
 

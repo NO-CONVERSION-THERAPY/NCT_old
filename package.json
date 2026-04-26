@@ -12,9 +12,13 @@
     "test:standalone": "FRONTEND_VARIANT=legacy node --test tests/standaloneFormApp.test.js",
     "secure-config": "node scripts/secure-config.js",
     "dev:workers": "npx wrangler dev",
-    "deploy:workers": "npx wrangler deploy --keep-vars",
+    "cf:ensure": "node scripts/ensure-cloudflare-resources.mjs --config wrangler.jsonc --migrate NCT_DB",
+    "cf:ensure:standalone-form": "node scripts/ensure-cloudflare-resources.mjs --config standalone/form-worker/wrangler.jsonc --migrate NCT_DB",
+    "deploy:workers": "npm run cf:ensure && npx wrangler deploy --keep-vars",
+    "deploy:workers:preview": "npm run cf:ensure && npx wrangler versions upload",
     "dev:workers:standalone-form": "npx wrangler dev -c standalone/form-worker/wrangler.jsonc",
-    "deploy:workers:standalone-form": "npx wrangler deploy -c standalone/form-worker/wrangler.jsonc --keep-vars"
+    "deploy:workers:standalone-form": "npm run cf:ensure:standalone-form && npx wrangler deploy -c standalone/form-worker/wrangler.jsonc --keep-vars",
+    "deploy:workers:standalone-form:preview": "npm run cf:ensure:standalone-form && npx wrangler versions upload -c standalone/form-worker/wrangler.jsonc"
   },
   "engines": {
     "node": "20.x"

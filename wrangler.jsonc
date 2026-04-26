@@ -1,6 +1,6 @@
 {
   "$schema": "node_modules/wrangler/config-schema.json",
-  "name": "nct",
+  "name": "nct-old",
   "main": "./worker.mjs",
   "compatibility_date": "2026-04-04",
   "compatibility_flags": [
@@ -24,6 +24,8 @@
   "d1_databases": [
     {
       "binding": "NCT_DB",
+      "database_name": "nct-old",
+      "database_id": "00000000-0000-0000-0000-000000000000",
       "migrations_dir": "migrations"
     }
   ],

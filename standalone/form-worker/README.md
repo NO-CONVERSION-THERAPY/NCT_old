@@ -31,44 +31,34 @@ npm run dev
 npm run dev:workers:standalone-form
 ```
 
-## 部署
+## Cloudflare Workers 部署
 
-```bash
-npm run deploy
-```
+仅推荐使用 Cloudflare Dashboard 的 Workers Builds 网页部署。这个独立问卷 Worker 的项目名使用目录名的 Workers 兼容形式：`nct-old-standalone-form-worker`。
 
-或者从仓库根目录运行：
+部署命令里的 `npm run cf:ensure` 会自动创建 D1 数据库 `nct-old-standalone-form-worker`、把真实 `database_id` 写入当前构建环境中的 [`wrangler.jsonc`](./wrangler.jsonc)，并执行远端 D1 migrations；不需要再手动创建 D1 或手动填写 `database_id`。
 
-```bash
-npm run deploy:workers:standalone-form
-```
+### Workers Builds 填写
 
-## GitHub 直连部署到 Workers
+| Cloudflare 页面字段 | 填写值 |
+| --- | --- |
+| Project name | `nct-old-standalone-form-worker` |
+| Production branch | 你的生产分支，例如 `main` |
+| Path / Root directory | 在本仓库部署填 `NCT_old`；如果本项目单独成库填 `/` |
+| Build command | `npm run test:standalone` |
+| Deploy command | `npm run deploy:workers:standalone-form` |
+| Non-production branch deploy command | `npm run deploy:workers:standalone-form:preview` |
 
-如果你已经把整个仓库上传到 GitHub，推荐在 Cloudflare 里单独新建一个 Worker，并把它连接到同一个仓库。这个独立 Worker 只部署当前目录对应的问卷入口，不影响主站的其它入口。
+说明：`Path / Root directory` 需要指向 `NCT_old` 项目根，而不是 `standalone/form-worker`，因为这个 Worker 会复用根目录下的服务端代码、模板、静态资源、依赖和 migrations。
 
-### 1. 连接仓库
+### 网页端步骤
 
-1. 进入 Cloudflare `Workers & Pages`
-2. 新建一个 Worker
-3. 选择 `Connect to Git`
-4. 选择你的 GitHub 仓库和生产分支，例如 `main`
+1. 进入 Cloudflare Dashboard -> `Workers & Pages` -> `Create` -> `Import a repository`。
+2. 选择 Git 仓库后，按上表填写 `Project name`、`Path`、`Build command`、`Deploy command` 和 `Non-production branch deploy command`。
+3. 在 `Settings` -> `Variables and Secrets` 配置运行时变量。
+4. 在 `Settings` -> `Domains & Routes` -> `Add` -> `Custom Domain` 绑定问卷域名。
+5. 推送生产分支触发部署；部署完成后，这个独立 Worker 的首页 `/` 就是问卷填写页。
 
-### 2. Build 设置
-
-在 Worker 的 `Settings > Build` 中推荐这样填写：
-
-- `Root directory`：`.`
-- `Build command`：留空
-- `Deploy command`：`npm run deploy:workers:standalone-form`
-- `Non-production branch deploy command`：`npx wrangler versions upload -c standalone/form-worker/wrangler.jsonc`
-
-说明：
-
-- `Root directory` 需要指向仓库根目录，而不是 `standalone/form-worker`
-- 原因是这个独立问卷 Worker 会复用根目录下的服务端代码、模板、静态资源和依赖
-
-### 3. 运行时变量
+### 运行时变量
 
 在 Worker 的 `Settings > Variables & Secrets` 中配置运行时变量，不要只填到 Build Variables。
 
@@ -90,26 +80,12 @@ npm run deploy:workers:standalone-form
 
 这样不需要先配置 D1，就可以先把提交链路跑通。
 
-### 4. 可选：启用 D1 落库
+### 可选：启用 D1 落库
 
 如果你希望问卷提交同时写入 D1：
 
-1. 创建 D1 数据库
-2. 把返回的 `database_name` 和 `database_id` 填入当前目录的 `wrangler.jsonc`
-3. 运行远程 migrations
-
-示例命令：
-
-```bash
-npx wrangler d1 create <database-name>
-npx wrangler d1 migrations apply <database-name> --remote --config standalone/form-worker/wrangler.jsonc
-```
-
-完成后，再把 `FORM_SUBMIT_TARGET` 改成 `d1` 或 `both`。
-
-### 5. 部署结果
-
-部署完成后，这个独立 Worker 的首页 `/` 就是问卷填写页。
+1. 把 `FORM_SUBMIT_TARGET` 改成 `d1` 或 `both`。
+2. 推送部署。`Deploy command` 会自动创建并迁移 D1 数据库。
 
 ## 说明
 
