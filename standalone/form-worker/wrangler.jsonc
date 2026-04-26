@@ -1,6 +1,6 @@
 {
   "$schema": "../../node_modules/wrangler/config-schema.json",
-  "name": "nct-standalone-form",
+  "name": "nct-old-standalone-form-worker",
   "main": "./worker.mjs",
   "compatibility_date": "2026-04-17",
   "compatibility_flags": [
@@ -13,6 +13,8 @@
   "d1_databases": [
     {
       "binding": "NCT_DB",
+      "database_name": "nct-old-standalone-form-worker",
+      "database_id": "00000000-0000-0000-0000-000000000000",
       "migrations_dir": "../../migrations"
     }
   ],

@@ -3,6 +3,8 @@
   "private": true,
   "scripts": {
     "dev": "npx wrangler dev -c wrangler.jsonc",
-    "deploy": "npx wrangler deploy -c wrangler.jsonc --keep-vars"
+    "cf:ensure": "node ../../scripts/ensure-cloudflare-resources.mjs --config wrangler.jsonc --migrate NCT_DB",
+    "deploy": "npm run cf:ensure && npx wrangler deploy -c wrangler.jsonc --keep-vars",
+    "deploy:preview": "npm run cf:ensure && npx wrangler versions upload -c wrangler.jsonc"
   }
 }
